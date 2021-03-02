@@ -49,8 +49,8 @@ uint16_t ButtonMatrixState = 0;
 //Button TimeStamp
 uint32_t ButtonMatrixTimestamp = 0;
 
-uint16_t StudentID = 0;
 int CountID = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -287,178 +287,157 @@ void ButtonMatrixUpdate()
 			if (PinState == GPIO_PIN_RESET) // Button Press
 			{
 				ButtonMatrixState |= (uint16_t) 1 << (i + ButtonMatrixRow * 4);
-				if(CountID == 0)
-				{
-					if(ButtonMatrixState == 0b1000000) //6
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 1;
-						HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 1)
-				{
-					if(ButtonMatrixState == 0b1000000000) //2
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 2;
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 2)
-				{
-					if(ButtonMatrixState == 0b10000000000) //3
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 3;
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 3)
-				{
-					if(ButtonMatrixState == 0b10000) //4
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 4;
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 4)
-				{
-					if(ButtonMatrixState == 0b1000000000000) //0
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 5;
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 5)
-				{
-					if(ButtonMatrixState == 0b100000) //5
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 6;
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 6)
-				{
-					if(ButtonMatrixState == 0b1000000000000) //0
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 7;
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 7)
-				{
-					if(ButtonMatrixState == 0b1000000000000) //0
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 8;
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 8)
-				{
-					if(ButtonMatrixState == 0b1000000000000) //0
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 9;
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 9)
-				{
-					if(ButtonMatrixState == 0b1000000000000) //0
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 10;
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 10)
-				{
-					if(ButtonMatrixState == 0b1) //7
-					{
-						StudentID = StudentID << 1;
-						StudentID = StudentID | 1;
-						CountID = 11;
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
-				if(CountID == 11)
-				{
-					if(ButtonMatrixState == 0b1000000000000000)//ok
-					{
-						HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-					}
-					else
-					{
-						CountID = 0;
-					}
-					break;
-				}
 				if(ButtonMatrixState == 0b1000) //clear
 				{
-					StudentID = 0;
-					StudentID = StudentID >> 16;
 					CountID = 0;
+					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+				}
+				switch(CountID)
+				{
+					case 0:
+					{
+						if(ButtonMatrixState == 0b1000000) //6
+						{
+							CountID = 1;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 1:
+					{
+						if(ButtonMatrixState == 0b1000000000) //2
+						{
+							CountID = 2;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 2:
+					{
+						if(ButtonMatrixState == 0b10000000000) //3
+						{
+							CountID = 3;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 3:
+					{
+						if(ButtonMatrixState == 0b10000) //4
+						{
+							CountID = 4;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 4:
+					{
+						if(ButtonMatrixState == 0b1000000000000) //0
+						{
+							CountID = 5;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 5:
+					{
+						if(ButtonMatrixState == 0b100000) //5
+						{
+							CountID = 6;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 6:
+					{
+						if(ButtonMatrixState == 0b1000000000000) //0
+						{
+							CountID = 7;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 7:
+					{
+						if(ButtonMatrixState == 0b1000000000000) //0
+						{
+							CountID = 8;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 8:
+					{
+						if(ButtonMatrixState == 0b1000000000000) //0
+						{
+							CountID = 9;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 9:
+					{
+						if(ButtonMatrixState == 0b1000000000000) //0
+						{
+							CountID = 10;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 10:
+					{
+						if(ButtonMatrixState == 0b1) //7
+						{
+							CountID = 11;
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
+					case 11:
+					{
+						if(ButtonMatrixState == 0b1000000000000000)//ok
+						{
+							HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+						}
+						else
+						{
+							CountID = 0;
+						}
+						break;
+					}
 				}
 
 			}
