@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -43,10 +43,14 @@
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+//save status of Button Matrix
 uint16_t ButtonMatrixState = 0;
 
 //Button TimeStamp
 uint32_t ButtonMatrixTimestamp = 0;
+
+uint16_t StudentID = 0;
+int CountID = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -54,7 +58,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-//scan and update data of button Matrix
+//scan and update data of Button Matrix
 void ButtonMatrixUpdate();
 /* USER CODE END PFP */
 
@@ -98,13 +102,13 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+	while (1)
+	{
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	ButtonMatrixUpdate();
-  }
+		ButtonMatrixUpdate();
+	}
   /* USER CODE END 3 */
 }
 
@@ -261,34 +265,220 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-GPIO_TypeDef *ButtonMatrixPort[8] = {GPIOA,GPIOB,GPIOB,GPIOB,GPIOA,GPIOC,GPIOB,GPIOA};
-uint16_t ButtonMatrixPin[8] = {GPIO_PIN_10,GPIO_PIN_3,GPIO_PIN_5,GPIO_PIN_4,GPIO_PIN_9,GPIO_PIN_7,GPIO_PIN_6,GPIO_PIN_17};
+//port/pin array , 0-3 input , 4-7 output
+GPIO_TypeDef *ButtonMatrixPort[8] =
+{ GPIOA, GPIOB, GPIOB, GPIOB, GPIOA, GPIOC, GPIOB, GPIOA };
 
-uint8_t ButtonMatrixRow = 0; //What R Now
+uint16_t ButtonMatrixPin[8] =
+{ GPIO_PIN_10, GPIO_PIN_3, GPIO_PIN_5, GPIO_PIN_4, GPIO_PIN_9, GPIO_PIN_7,
+GPIO_PIN_6, GPIO_PIN_7 };
+
+uint8_t ButtonMatrixRow = 0;  //What  R Now
 void ButtonMatrixUpdate()
 {
-	if(HAL_GetTick() - ButtonMatrixTimestamp >= 100)
+	if (HAL_GetTick() - ButtonMatrixTimestamp >= 100)
 	{
 		ButtonMatrixTimestamp = HAL_GetTick();
-		for(i = 0;i<4;++i)
-		{
-			GPIO_PinState PinState = HAL_GPIO_ReadPin(ButtonMatrixPort[i], ButtonMatrixPin[i]);
-			if(PinState == GPIO_PIN_RESET) //Button Press
+		int i;
+		for (i = 0; i < 4; i += 1)
+		{ //0-3
+			GPIO_PinState PinState = HAL_GPIO_ReadPin(ButtonMatrixPort[i],
+					ButtonMatrixPin[i]);
+			if (PinState == GPIO_PIN_RESET) // Button Press
 			{
-				ButtonMatrixState = (uint16_t)1 << (i + ButtonMatrixRow*4); //0b0000000000000000 | 0b1000
+				ButtonMatrixState |= (uint16_t) 1 << (i + ButtonMatrixRow * 4);
+				if(CountID == 0)
+				{
+					if(ButtonMatrixState == 0b1000000) //6
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 1;
+						HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 1)
+				{
+					if(ButtonMatrixState == 0b1000000000) //2
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 2;
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 2)
+				{
+					if(ButtonMatrixState == 0b10000000000) //3
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 3;
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 3)
+				{
+					if(ButtonMatrixState == 0b10000) //4
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 4;
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 4)
+				{
+					if(ButtonMatrixState == 0b1000000000000) //0
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 5;
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 5)
+				{
+					if(ButtonMatrixState == 0b100000) //5
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 6;
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 6)
+				{
+					if(ButtonMatrixState == 0b1000000000000) //0
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 7;
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 7)
+				{
+					if(ButtonMatrixState == 0b1000000000000) //0
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 8;
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 8)
+				{
+					if(ButtonMatrixState == 0b1000000000000) //0
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 9;
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 9)
+				{
+					if(ButtonMatrixState == 0b1000000000000) //0
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 10;
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 10)
+				{
+					if(ButtonMatrixState == 0b1) //7
+					{
+						StudentID = StudentID << 1;
+						StudentID = StudentID | 1;
+						CountID = 11;
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(CountID == 11)
+				{
+					if(ButtonMatrixState == 0b1000000000000000)//ok
+					{
+						HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+					}
+					else
+					{
+						CountID = 0;
+					}
+					break;
+				}
+				if(ButtonMatrixState == 0b1000) //clear
+				{
+					StudentID = 0;
+					StudentID = StudentID >> 16;
+					CountID = 0;
+				}
+
 			}
 			else
 			{
-				ButtonMatrixState &= ~((uint16_t)1 << (i + ButtonMatrixRow*4));  //0b0000000000000000 & ~(0b1000)
+				ButtonMatrixState &= ~((uint16_t) 1 << (i + ButtonMatrixRow * 4));
 			}
 		}
 		uint8_t NowOutputPin = ButtonMatrixRow + 4;
-		HAL_GPIO_WritePin(ButtonMatrixPort[NowOutputPin], ButtonMatrixPin[NowOutputPin], GPIO_Pin_SET);
-		ButtonMatrixRow = (ButtonMatrixRow+1) % 4;
+		//SET Rn
+		HAL_GPIO_WritePin(ButtonMatrixPort[NowOutputPin],
+				ButtonMatrixPin[NowOutputPin], GPIO_PIN_SET);
+		// update New Row
+		ButtonMatrixRow = (ButtonMatrixRow + 1) % 4;
 
 		uint8_t NextOutputPin = ButtonMatrixRow + 4;
+		//Reset Rn+1
+		HAL_GPIO_WritePin(ButtonMatrixPort[NextOutputPin],
+				ButtonMatrixPin[NextOutputPin], GPIO_PIN_RESET);
 
-		HAL_GPIO_WritePin(ButtonMatrixPort[NowOutputPin], ButtonMatrixPin[NowOutputPin], GPIO_Pin_RESET);
 	}
 }
 /* USER CODE END 4 */
@@ -300,11 +490,11 @@ void ButtonMatrixUpdate()
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1)
+	{
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 
