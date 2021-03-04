@@ -290,9 +290,9 @@ void ButtonMatrixUpdate()
 				if(ButtonMatrixState == 0b1000) //clear
 				{
 					CountID = 0;
-					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET); //off
 				}
-				switch(CountID)
+				switch(CountID) //62340500007
 				{
 					case 0:
 					{
@@ -430,7 +430,7 @@ void ButtonMatrixUpdate()
 					{
 						if(ButtonMatrixState == 0b1000000000000000)//ok
 						{
-							HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+							HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET); //on
 						}
 						else
 						{
